@@ -1,0 +1,16 @@
+<div class="rounded bg-light p-3" {{ attributes }}>
+    {{ form_start(list.form) }}
+    <input type="hidden" name="page" value="1"/>
+    <input type="hidden" name="limit" value="{{ list.pagination.limit }}"/>
+    <input type="hidden" name="sorting" value="{{ list.pagination.sorting.name }}"/>
+    <input type="hidden" name="direction" value="{{ list.pagination.direction.name }}"/>
+    <fieldset class="mb-3">
+        {{ form_row(list.form.search) }}
+    </fieldset>
+    <div class="mb-3 d-flex flex-column gap-3">
+        {{ form_label(list.form.tags) }}
+        {{ form_widget(list.form.tags) }}
+    </div>
+    <button class="btn btn-secondary w-100" type="submit">Filtrer</button>
+    {{ form_end(list.form) }}
+</div>

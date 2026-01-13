@@ -1,0 +1,24 @@
+@import 'utils/colors';
+@import 'utils/text';
+@import 'utils/forms';
+@import '../../vendor/twbs/bootstrap/scss/bootstrap';
+@import 'base/text';
+@import "components/alerts";
+@import "components/badges";
+@import "components/buttons";
+@import "components/breadcrumbs";
+@import "components/cards";
+@import "components/navbar";
+@import "components/progress";
+@import "components/spinners";
+@import "components/toasts";
+@import "components/pagination";
+@import "components/forms";
+@import "components/game-card";
+@import "components/tabs";
+@import "components/ratings";
+@import "pages/auth";
+
+html, body {
+  height: 100%;
+}

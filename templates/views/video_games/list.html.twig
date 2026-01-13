@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="video-games-list d-flex flex-column gap-5">
+    {% for video_game in list %}
+        <article class="game-card">
+            <h2 class="game-card-title">
+                <a href="{{ path('video_games_show', {slug: video_game.slug}) }}">
+                    {{ video_game.title }}
+                </a>
+            </h2>
+        </article>
+    {% endfor %}
+</div>
+
+<div class="list-info">
+    {% if list|length > 0 %}
+        Affiche {{ list|length }} jeux vidéo de 1 à {{ list|length }} sur les {{ list|length }} jeux vidéo
+    {% else %}
+        Aucun jeu vidéo ne correspond à votre recherche.
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+.ratings {
+  margin-top: 10px;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.rating-square {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 100px;
+  background-color: $warning;
+  border-radius: 10px;
+  text-align: center;
+  position: relative;
+
+  .value {
+    font-size: 2.5rem;
+    color: $dark;
+    font-family: $font-family-headings;
+  }
+
+  .label {
+    font-size: 0.8rem;
+    color: $dark;
+    text-transform: uppercase;
+  }
+}
+
+@for $i from 1 through 5 {
+  .rating-#{$i} {
+    .rating-square {
+      $height: $i * 20%;
+      background: linear-gradient(to top, $primary $height, transparent $height, transparent 100%), $warning;
+    }
+  }
+}

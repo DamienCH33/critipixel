@@ -1,0 +1,34 @@
+{% extends 'bootstrap_5_layout.html.twig' %}
+
+{% block checkbox_widget %}
+    <div>
+        <input type="checkbox" class="btn-check" id="{{ id }}" name="{{ full_name }}" value="{{ value }}"
+               {% if checked %}checked{% endif %} autocomplete="off">
+        <label class="btn btn-outline-primary" for="{{ id }}">{{ label }}</label>
+    </div>
+{% endblock %}
+
+{% block form_row %}
+    {% if form.vars.form.children|length > 0 %}
+        {{ parent() }}
+    {% else %}
+        <div class="form-floating">
+            {{ form_widget(form) }}
+            {{ form_label(form) }}
+        </div>
+    {% endif %}
+{% endblock form_row %}
+
+{% block form_label %}
+    {% if label is not same as(false) %}
+        {% if required %}
+            {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' required')|trim}) %}
+        {% endif %}
+        {% if label is empty %}
+            {% set label = name|humanize %}
+        {% endif %}
+        <label for="{{ form.vars.id }}"{% for attr_name, attr_value in label_attr %} {{ attr_name }}="{{ attr_value }}"{% endfor %}>
+        {{ label }}
+        </label>
+    {% endif %}
+{% endblock form_label %}

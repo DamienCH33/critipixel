@@ -1,0 +1,26 @@
+.nav-pills {
+  display: flex;
+  gap: 3rem;
+
+  .nav-link {
+    transition: none;
+    padding: var(--bs-nav-link-padding-y) calc(var(--bs-nav-link-padding-x) * 2);
+
+    &[aria-selected=true] {
+      position: relative;
+
+      &::before {
+        content: "";
+        position: absolute;
+        left: calc(50% - 0.5rem);
+        bottom: -.5rem;
+        display: block;
+        background-color: $primary;
+        height: 1rem;
+        width: 1rem;
+        transform: rotate(45deg);
+        transform-origin: 50% 50%;
+      }
+    }
+  }
+}

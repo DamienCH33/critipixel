@@ -1,0 +1,40 @@
+<form name="sorting" method="get" class="row" {{ attributes }}>
+    <input type="hidden" name="page" value="1">
+    <input type="hidden" name="filter[search]" value="{{ list.filter.search }}"/>
+    {% for tag in list.filter.tags %}
+        <input type="hidden" name="filter[tags][]" value="{{ tag.id }}"/>
+    {% endfor %}
+    <div class="col">
+        <div class="form-floating">
+            <select class="form-select" id="limit" name="limit" aria-label="Jeux vidéo par page">
+                {% for limit in [10, 25, 50, 100] %}
+                    <option value="{{ limit }}" {{ limit == list.pagination.limit ? 'selected' }}>{{ limit }}</option>
+                {% endfor %}
+            </select>
+            <label for="limit">Jeux vidéo par page</label>
+        </div>
+    </div>
+    <div class="col">
+        <div class="form-floating">
+            <select class="form-select" id="sorting" name="sorting" aria-label="Tri">
+                {% for sorting in list.pagination.allSorting %}
+                    <option value="{{ sorting.name }}" {{ sorting.name == list.pagination.sorting.name ? 'selected' }}>{{ sorting.value }}</option>
+                {% endfor %}
+            </select>
+            <label for="sorting">Tri</label>
+        </div>
+    </div>
+    <div class="col">
+        <div class="form-floating">
+            <select class="form-select" id="direction" name="direction" aria-label="Tri">
+                {% for direction in list.pagination.directions %}
+                    <option value="{{ direction.name }}" {{ direction.name == list.pagination.direction.name ? 'selected' }}>{{ direction.value }}</option>
+                {% endfor %}
+            </select>
+            <label for="direction">Ordre</label>
+        </div>
+    </div>
+    <div class="col-2">
+        <button type="submit" class="w-100 h-100 btn btn-primary">Trier</button>
+    </div>
+</form>

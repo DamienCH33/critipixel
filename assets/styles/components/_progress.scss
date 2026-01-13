@@ -1,0 +1,10 @@
+.progress {
+  background-color: rgba($dark, 0.25);
+  height: 1rem;
+  border-radius: .25rem;
+
+  .progress-bar {
+    font-family: $headings-font-family;
+    background-color: $primary;
+  }
+}

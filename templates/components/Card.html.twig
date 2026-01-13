@@ -1,0 +1,27 @@
+<article{{ attributes }} class="card game-card">
+    <div class="row g-0">
+        <a href="{{ path('video_games_show', {slug: video_game.slug}) }}" class="col-md-4">
+            <img src="{{ vich_uploader_asset(video_game, 'imageFile', 'App\\Model\\Entity\\VideoGame') }}" class="img-fluid rounded-start game-card-image" alt="Couverture de {{ video_game.title|e }}">
+        </a>
+        <div class="col-md-8">
+            <div class="card-body">
+                <h5 class="game-card-title">
+                    <a href="{{ path('video_games_show', {slug: video_game.slug}) }}" class="text-decoration-none">{{ video_game.title }}</a>
+                </h5>
+                <p class="game-card-description">{{ video_game.description|u.truncate(130, '...', true)|raw }}</p>
+                <p class="game-card-text"><small class="text-muted">Sortie: {{ video_game.releaseDate|date('m/d/Y') }}</small></p>
+                <div class="game-card-tags">
+                    {% for tag in video_game.tags|slice(0, 5) %}
+                        <span class="tag">{{ tag.name }}</span>
+                    {% endfor %}
+                </div>
+                <div class="ratings">
+                    <twig:Rating rating="{{ video_game.rating }}" label="Test" />
+                    {% if video_game.averageRating is not null %}
+                        <twig:Rating rating="{{ video_game.averageRating }}" label="Avis" />
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</article>

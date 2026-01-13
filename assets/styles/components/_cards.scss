@@ -1,0 +1,6 @@
+.card {
+  font-family: $font-family-base;
+  border-radius: .25rem;
+  border: 2px solid $secondary;
+  box-shadow: 3px 3px 0px darken($secondary, 15%);
+}

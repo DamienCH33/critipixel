@@ -1,0 +1,11 @@
+<div{{ attributes }} class="list-group-item">
+    <div class="d-flex gap-3">
+        <twig:Rating rating="{{ review.rating }}" label="Note" />
+        <div class="d-flex flex-column gap-2 w-100 justify-content-start">
+            <h3 class="m-0">{{ review.user.username }}</h3>
+            {% if review.comment is not null %}
+                <p class="m-0">{{ review.comment }}</p>
+            {% endif %}
+        </div>
+    </div>
+</div>

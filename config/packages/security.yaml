@@ -1,0 +1,37 @@
+security:
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'bcrypt'
+    providers:
+        user_provider:
+            entity:
+                class: App\Model\Entity\User
+                property: email
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        main:
+            lazy: true
+            provider: user_provider
+            form_login:
+                username_parameter: email
+                password_parameter: password
+                login_path: auth_login
+                check_path: auth_login
+                enable_csrf: true
+            logout:
+                path: /auth/logout
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800
+    access_control:
+        - {path: ^/auth/register, roles: PUBLIC_ACCESS}
+
+when@test:
+    security:
+        password_hashers:
+            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+                algorithm: auto
+                cost: 4
+                time_cost: 3
+                memory_cost: 10

@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container h-100 d-flex flex-column justify-content-center">
+        <div class="row justify-content-center">
+            {{ form_start(form) }}
+                <h1 class="h3 mb-3 fw-normal">Bienvenue !</h1>
+                {{ form_errors(form) }}
+                <fieldset class="mb-3">
+                    {{ form_row(form.username) }}
+                    {{ form_row(form.email) }}
+                    {{ form_row(form.plainPassword) }}
+                </fieldset>
+                <button class="btn btn-primary w-100 py-2" type="submit">S'inscrire</button>
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}
