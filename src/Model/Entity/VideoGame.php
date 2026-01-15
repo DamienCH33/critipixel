@@ -7,85 +7,74 @@ namespace App\Model\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Mapping\Column;
-use Doctrine\ORM\Mapping\Embedded;
-use Doctrine\ORM\Mapping\Entity;
-use Doctrine\ORM\Mapping\GeneratedValue;
-use Doctrine\ORM\Mapping\Id;
-use Doctrine\ORM\Mapping\JoinTable;
-use Doctrine\ORM\Mapping\ManyToMany;
-use Doctrine\ORM\Mapping\OneToMany;
+use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation\Slug;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\Range;
 use Vich\UploaderBundle\Mapping\Annotation\Uploadable;
 use Vich\UploaderBundle\Mapping\Annotation\UploadableField;
 
-#[Entity]
+#[ORM\Entity]
 #[UniqueEntity('slug')]
 #[Uploadable]
 class VideoGame
 {
-    #[Id]
-    #[GeneratedValue(strategy: 'IDENTITY')]
-    #[Column]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    #[ORM\Column]
     private ?int $id = null;
 
     #[NotBlank]
     #[Length(max: 100)]
-    #[Column(length: 100)]
+    #[ORM\Column(length: 100)]
     private string $title;
 
-    #[Column(nullable: true)]
+    #[ORM\Column(nullable: true)]
     private ?string $imageName = null;
 
-    #[Column(nullable: true)]
+    #[ORM\Column(nullable: true)]
     private ?int $imageSize = null;
 
     #[UploadableField(mapping: 'video_games', fileNameProperty: 'imageName', size: 'imageSize')]
     private ?File $imageFile = null;
 
-    #[Column(unique: true)]
+    #[ORM\Column(unique: true)]
     #[Slug(fields: ['title'])]
     private string $slug;
 
     #[NotBlank]
-    #[Column(type: Types::TEXT)]
+    #[ORM\Column(type: Types::TEXT)]
     private string $description;
 
-    #[Column(type: Types::DATE_IMMUTABLE)]
+    #[ORM\Column(type: Types::DATE_IMMUTABLE)]
     private \DateTimeInterface $releaseDate;
 
-    #[Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
-    private \DateTimeImmutable $updatedAt;
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $updatedAt = null;
 
-    #[Column(type: Types::TEXT, nullable: true)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $test = null;
 
     #[Range(min: 1, max: 5)]
-    #[Column(nullable: true)]
+    #[ORM\Column(nullable: true)]
     private ?int $rating = null;
 
-    #[Column(nullable: true)]
+    #[ORM\Column(nullable: true)]
     private ?int $averageRating = null;
 
-    #[Embedded(class: NumberOfRatingPerValue::class, columnPrefix: '')]
+    #[ORM\Embedded(class: NumberOfRatingPerValue::class, columnPrefix: '')]
     private NumberOfRatingPerValue $numberOfRatingsPerValue;
 
-    /**
-     * @var Collection<Tag>
-     */
-    #[ManyToMany(targetEntity: Tag::class)]
-    #[JoinTable(name: 'video_game_tags')]
+    /** @var Collection<int, Tag> */
+    #[ORM\ManyToMany(targetEntity: Tag::class)]
+    #[ORM\JoinTable(name: 'video_game_tags')]
     private Collection $tags;
 
-    /**
-     * @var Collection<Review>
-     */
-    #[OneToMany(targetEntity: Review::class, mappedBy: 'videoGame')]
+    /** @var Collection<int, Review> */
+    #[ORM\OneToMany(targetEntity: Review::class, mappedBy: 'videoGame')]
     private Collection $reviews;
 
     public function __construct()
@@ -100,7 +89,6 @@ class VideoGame
     {
         return $this->id;
     }
-
     public function getTitle(): string
     {
         return $this->title;
@@ -229,7 +217,7 @@ class VideoGame
     }
 
     /**
-     * @return Collection<Tag>
+     * @return Collection<int, Tag>
      */
     public function getTags(): Collection
     {
@@ -237,7 +225,7 @@ class VideoGame
     }
 
     /**
-     * @return Collection<Review>
+     * @return Collection<int, Review>
      */
     public function getReviews(): Collection
     {
@@ -246,6 +234,11 @@ class VideoGame
 
     public function hasAlreadyReview(User $user): bool
     {
-        return $this->reviews->exists(static fn (int $key, Review $review): bool => $review->getUser()->getId() === $user->getId());
+        return $this->reviews->exists(static fn(int $key, Review $review): bool => $review->getUser()->getId() === $user->getId());
     }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+{
+    return $this->updatedAt;
+}
 }

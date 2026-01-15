@@ -19,39 +19,42 @@ final class VideoGameFixtures extends Fixture implements DependentFixtureInterfa
         private readonly Generator $faker,
         private readonly CalculateAverageRating $calculateAverageRating,
         private readonly CountRatingsPerValue $countRatingsPerValue,
-    ) {
-    }
+    ) {}
 
     public function load(ObjectManager $manager): void
     {
+        /** @var Tag[] $tags */
         $tags = $manager->getRepository(Tag::class)->findAll();
+        /** @var User[][] $users */
         $users = array_chunk($manager->getRepository(User::class)->findAll(), 5);
 
         $fakeText = $this->faker->paragraphs(5, true);
 
-        $videoGames = \array_fill_callback(
-            0,
-            50,
-            fn (int $index): VideoGame => (new VideoGame())
+        /** @var VideoGame[] $videoGames */
+        $videoGames = array_map(
+            fn(int $index): VideoGame => (new VideoGame())
                 ->setTitle(sprintf('Jeu vidéo %d', $index))
                 ->setDescription($fakeText)
                 ->setReleaseDate((new \DateTimeImmutable())->sub(new \DateInterval(sprintf('P%dD', $index))))
                 ->setTest($fakeText)
                 ->setRating(($index % 5) + 1)
                 ->setImageName(sprintf('video_game_%d.png', $index))
-                ->setImageSize(2_098_872)
+                ->setImageSize(2_098_872),
+            range(0, 49)
         );
 
-        array_walk($videoGames, static function (VideoGame $videoGame, int $index) use ($tags) {
+        foreach ($videoGames as $index => $videoGame) {
+            // Tags
             for ($tagIndex = 0; $tagIndex < 5; ++$tagIndex) {
                 $videoGame->getTags()->add($tags[($index + $tagIndex) % count($tags)]);
             }
-        });
 
-        array_walk($videoGames, [$manager, 'persist']);
+            $manager->persist($videoGame);
+        }
+
         $manager->flush();
 
-        array_walk($videoGames, function (VideoGame $videoGame, int $index) use ($users, $manager) {
+        foreach ($videoGames as $index => $videoGame) {
             $groupIndex = $index % count($users);
             $filteredUsers = $users[$groupIndex] ?? [];
 
@@ -63,7 +66,7 @@ final class VideoGameFixtures extends Fixture implements DependentFixtureInterfa
                 $this->calculateAverageRating->calculateAverage($videoGame);
                 $this->countRatingsPerValue->countRatingsPerValue($videoGame);
             }
-        });
+        }
 
         $manager->flush();
     }

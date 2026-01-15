@@ -15,13 +15,18 @@ final class UserFixtures extends Fixture
             ->setUsername('existingUser')
             ->setPlainPassword('password');
 
-        $users = array_fill_callback(0, 10, fn (int $index): User => (new User())
-            ->setEmail(sprintf('user+%d@email.com', $index))
-            ->setUsername(sprintf('user+%d', $index))
-            ->setPlainPassword('password')
+        /** @var User[] $users */
+        $users = array_map(
+            fn(int $index): User => (new User())
+                ->setEmail(sprintf('user+%d@email.com', $index))
+                ->setUsername(sprintf('user+%d', $index))
+                ->setPlainPassword('password'),
+            range(0, 9)
         );
 
-        array_walk($users, [$manager, 'persist']);
+        foreach ($users as $user) {
+            $manager->persist($user);
+        }
 
         $manager->flush();
     }

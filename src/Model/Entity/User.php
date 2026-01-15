@@ -5,46 +5,39 @@ declare(strict_types=1);
 namespace App\Model\Entity;
 
 use App\Doctrine\EntityListener\UserListener;
-use Doctrine\ORM\Mapping\Column;
-use Doctrine\ORM\Mapping\Entity;
-use Doctrine\ORM\Mapping\EntityListeners;
-use Doctrine\ORM\Mapping\GeneratedValue;
-use Doctrine\ORM\Mapping\Id;
-use Doctrine\ORM\Mapping\Table;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\NoSuspiciousCharacters;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\NotCompromisedPassword;
-use Symfony\Component\Validator\Constraints\PasswordStrength;
+use Symfony\Component\Validator\Constraints\NoSuspiciousCharacters;
 
-#[Entity]
-#[Table('`user`')]
+#[ORM\Entity]
+#[ORM\Table('`user`')]
 #[UniqueEntity(fields: ['email'], message: 'Cet email est déjà utilisé.')]
 #[UniqueEntity(fields: ['username'], message: 'Ce nom d\'utilisateur existe déjà.')]
-#[EntityListeners([UserListener::class])]
+#[ORM\EntityListeners([UserListener::class])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    #[Id]
-    #[GeneratedValue(strategy: 'IDENTITY')]
-    #[Column]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    #[ORM\Column]
     private ?int $id = null;
 
     #[NotBlank]
     #[Length(max: 30)]
-    #[Column(length: 30, unique: true)]
-    private ?string $username = null;
+    #[ORM\Column(length: 30, unique: true)]
+    private string $username;
 
     #[NotBlank]
     #[Email]
     #[NoSuspiciousCharacters]
-    #[Column(unique: true)]
-    private ?string $email = null;
+    #[ORM\Column(unique: true)]
+    private string $email;
 
-    #[Column(length: 60, nullable: true)]
+    #[ORM\Column(length: 60, nullable: true)]
     private ?string $password = null;
 
     private ?string $plainPassword = null;
@@ -54,27 +47,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->id;
     }
 
-    public function getUsername(): ?string
+    public function getUsername(): string
     {
         return $this->username;
     }
 
-    public function setUsername(string $username): User
+    public function setUsername(string $username): self
     {
         $this->username = $username;
-
         return $this;
     }
 
-    public function getEmail(): ?string
+    public function getEmail(): string
     {
         return $this->email;
     }
 
-    public function setEmail(string $email): User
+    public function setEmail(string $email): self
     {
         $this->email = $email;
-
         return $this;
     }
 
@@ -83,10 +74,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->password;
     }
 
-    public function setPassword(string $password): User
+    public function setPassword(string $password): self
     {
         $this->password = $password;
-
         return $this;
     }
 
@@ -95,10 +85,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->plainPassword;
     }
 
-    public function setPlainPassword(?string $plainPassword): User
+    public function setPlainPassword(?string $plainPassword): self
     {
         $this->plainPassword = $plainPassword;
-
         return $this;
     }
 

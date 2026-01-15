@@ -4,31 +4,27 @@ declare(strict_types=1);
 
 namespace App\Model\Entity;
 
-use Doctrine\ORM\Mapping\Column;
-use Doctrine\ORM\Mapping\Entity;
-use Doctrine\ORM\Mapping\GeneratedValue;
-use Doctrine\ORM\Mapping\Id;
-use Doctrine\ORM\Mapping\Table;
+use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation\Slug;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-#[Entity]
-#[Table('`tag`')]
+#[ORM\Entity]
+#[ORM\Table('`tag`')]
 class Tag
 {
-    #[Id]
-    #[GeneratedValue(strategy: 'IDENTITY')]
-    #[Column]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    #[ORM\Column]
     private ?int $id = null;
 
-    #[Column(unique: true)]
+    #[ORM\Column(unique: true)]
     #[Slug(fields: ['name'])]
-    private string $code;
+    private ?string $code = null;
 
     #[NotBlank]
     #[Length(max: 30)]
-    #[Column(length: 30)]
+    #[ORM\Column(length: 30)]
     private string $name;
 
     public function getId(): ?int
@@ -36,7 +32,7 @@ class Tag
         return $this->id;
     }
 
-    public function getCode(): string
+    public function getCode(): ?string
     {
         return $this->code;
     }
@@ -46,10 +42,9 @@ class Tag
         return $this->name;
     }
 
-    public function setName(string $name): Tag
+    public function setName(string $name): self
     {
         $this->name = $name;
-
         return $this;
     }
 }

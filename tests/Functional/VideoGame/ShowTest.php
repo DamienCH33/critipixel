@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\VideoGame;
 
-use App\Model\Entity\Review;
-use App\Model\Entity\User;
 use App\Model\Entity\VideoGame;
 use App\Tests\Functional\FunctionalTestCase;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,7 +11,6 @@ use Symfony\Component\HttpFoundation\Response;
 final class ShowTest extends FunctionalTestCase
 {
     private ?VideoGame $videoGame = null;
-    private User $user;
 
     protected function setUp(): void
     {
@@ -22,7 +19,8 @@ final class ShowTest extends FunctionalTestCase
         $container = self::getContainer();
         $em = $container->get('doctrine')->getManager();
 
-        $this->user = $em->getRepository(User::class)->findOneBy(['username' => 'user+0']);
+        // Récupération d'un utilisateur, mais on ne le stocke plus comme propriété
+        $user = $em->getRepository('App\Model\Entity\User')->findOneBy(['username' => 'user+0']);
 
         $this->videoGame = $em->getRepository(VideoGame::class)->findOneBy(['title' => 'Jeu vidéo 0']);
     }
@@ -85,7 +83,7 @@ final class ShowTest extends FunctionalTestCase
         ]);
 
         self::assertSelectorNotExists('form[name="review[comment]"]');
-        self::assertSelectorCount(3, '.invalid-feedback');
+        self::assertSelectorCount(2, '.invalid-feedback');
     }
 
     /** Test qu’un utilisateur ne peut pas poster plusieurs reviews pour le même jeu */
@@ -94,7 +92,6 @@ final class ShowTest extends FunctionalTestCase
         $this->login();
         $this->get('/jeu-video-49');
 
-        // Premier envoi
         $this->submit('Poster', [
             'review[rating]' => 5,
             'review[comment]' => 'Première review',

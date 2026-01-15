@@ -14,11 +14,12 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 #[AsTargetedValueResolver('pagination')]
 final readonly class PaginationValueResolver implements ValueResolverInterface
 {
+    /**
+     * @return iterable<Pagination>
+     */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
-        $argumentType = $argument->getType();
-
-        if (Pagination::class !== $argumentType) {
+        if ($argument->getType() !== Pagination::class) {
             return [];
         }
 

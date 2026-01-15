@@ -5,35 +5,30 @@ declare(strict_types=1);
 namespace App\Model\Entity;
 
 use Doctrine\DBAL\Types\Types;
-use Doctrine\ORM\Mapping\Column;
-use Doctrine\ORM\Mapping\Entity;
-use Doctrine\ORM\Mapping\GeneratedValue;
-use Doctrine\ORM\Mapping\Id;
-use Doctrine\ORM\Mapping\JoinColumn;
-use Doctrine\ORM\Mapping\ManyToOne;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints\Range;
 
-#[Entity]
+#[ORM\Entity]
 class Review
 {
-    #[Id]
-    #[GeneratedValue(strategy: 'IDENTITY')]
-    #[Column]
+    #[ORM\Id]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    #[ORM\Column]
     private ?int $id = null;
 
-    #[ManyToOne(targetEntity: VideoGame::class, inversedBy: 'reviews')]
-    #[JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[ORM\ManyToOne(targetEntity: VideoGame::class, inversedBy: 'reviews')]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private VideoGame $videoGame;
 
-    #[ManyToOne(targetEntity: User::class)]
-    #[JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: false)]
     private User $user;
 
     #[Range(min: 1, max: 5)]
-    #[Column]
+    #[ORM\Column(nullable: true)]
     private ?int $rating = null;
 
-    #[Column(type: Types::TEXT, nullable: true)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $comment = null;
 
     public function getId(): ?int
@@ -46,10 +41,9 @@ class Review
         return $this->videoGame;
     }
 
-    public function setVideoGame(VideoGame $videoGame): Review
+    public function setVideoGame(VideoGame $videoGame): self
     {
         $this->videoGame = $videoGame;
-
         return $this;
     }
 
@@ -58,10 +52,9 @@ class Review
         return $this->user;
     }
 
-    public function setUser(User $user): Review
+    public function setUser(User $user): self
     {
         $this->user = $user;
-
         return $this;
     }
 
@@ -70,10 +63,9 @@ class Review
         return $this->rating;
     }
 
-    public function setRating(int $rating): Review
+    public function setRating(?int $rating): self
     {
         $this->rating = $rating;
-
         return $this;
     }
 
@@ -82,10 +74,9 @@ class Review
         return $this->comment;
     }
 
-    public function setComment(?string $comment): Review
+    public function setComment(?string $comment): self
     {
         $this->comment = $comment;
-
         return $this;
     }
 }
