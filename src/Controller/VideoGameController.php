@@ -8,6 +8,7 @@ use App\Form\ReviewType;
 use App\List\ListFactory;
 use App\List\VideoGameList\Pagination;
 use App\Model\Entity\Review;
+use App\Model\Entity\User;
 use App\Model\Entity\VideoGame;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -35,19 +36,41 @@ final class VideoGameController extends AbstractController
     public function show(VideoGame $videoGame, EntityManagerInterface $entityManager, Request $request): Response
     {
         $review = new Review();
+        $review->setVideoGame($videoGame);
+
+        /** @var User|null $user */
+        $user = $this->getUser();
+        if ($user) {
+            $review->setUser($user);
+        }
 
         $form = $this->createForm(ReviewType::class, $review)->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if (!$user) {
+                return $this->redirectToRoute('auth_login');
+            }
+
             $this->denyAccessUnlessGranted('review', $videoGame);
-            $review->setVideoGame($videoGame);
-            $review->setUser($this->getUser());
+
+            $existingReview = $entityManager->getRepository(Review::class)->findOneBy([
+                'videoGame' => $videoGame,
+                'user' => $user,
+            ]);
+
+            if ($existingReview) {
+                return $this->redirectToRoute('video_games_show', ['slug' => $videoGame->getSlug()]);
+            }
+
             $entityManager->persist($review);
             $entityManager->flush();
 
             return $this->redirectToRoute('video_games_show', ['slug' => $videoGame->getSlug()]);
         }
 
-        return $this->render('views/video_games/show.html.twig', ['video_game' => $videoGame, 'form' => $form]);
+        return $this->render('views/video_games/show.html.twig', [
+            'video_game' => $videoGame,
+            'form' => $form,
+        ]);
     }
 }

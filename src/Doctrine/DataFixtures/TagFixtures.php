@@ -10,13 +10,16 @@ final class TagFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
-        $tags = \array_fill_callback(
-            0,
-            25,
-            static fn (int $index): Tag => (new Tag())->setName(sprintf('Tag %d', $index))
+        /** @var Tag[] $tags */
+        $tags = array_map(
+            static fn (int $index): Tag => (new Tag())->setName(sprintf('Tag %d', $index)),
+            range(0, 24)
         );
 
-        array_walk($tags, [$manager, 'persist']);
+        foreach ($tags as $tag) {
+            $manager->persist($tag);
+        }
+
         $manager->flush();
     }
 }

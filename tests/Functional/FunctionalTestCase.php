@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\DomCrawler\Crawler;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 abstract class FunctionalTestCase extends WebTestCase
 {
@@ -29,10 +30,8 @@ abstract class FunctionalTestCase extends WebTestCase
     /**
      * Récupère un service depuis le conteneur Symfony.
      *
-     * @template T
-     *
+     * @template T of object
      * @param class-string<T> $id
-     *
      * @return T
      */
     protected function service(string $id): object
@@ -41,18 +40,21 @@ abstract class FunctionalTestCase extends WebTestCase
     }
 
     /** Effectue une requête GET */
+    /** @param array<string, mixed> $parameters */
     protected function get(string $uri, array $parameters = []): Crawler
     {
         return $this->client->request('GET', $uri, $parameters);
     }
 
     /** Effectue une requête POST */
+    /** @param array<string, mixed> $parameters */
     protected function post(string $uri, array $parameters = []): Crawler
     {
         return $this->client->request('POST', $uri, $parameters);
     }
 
     /** Soumet un formulaire en ciblant le bouton par son label */
+    /** @param array<string, mixed> $values */
     protected function submit(string $buttonLabel, array $values = []): void
     {
         $crawler = $this->client->getCrawler();
@@ -64,25 +66,26 @@ abstract class FunctionalTestCase extends WebTestCase
     protected function login(string $email = 'user+0@email.com'): void
     {
         $user = $this->getEntityManager()->getRepository(User::class)->findOneBy(['email' => $email]);
-
         if (!$user) {
             throw new \RuntimeException(sprintf('Aucun utilisateur trouvé avec l’email "%s".', $email));
         }
-
         $this->client->loginUser($user);
     }
 
     /** Récupère l'utilisateur actuellement connecté */
     protected function getLoggedUser(): ?User
     {
-        $tokenStorage = $this->service('security.token_storage');
+        /** @var TokenStorageInterface $tokenStorage */
+        $tokenStorage = $this->service(TokenStorageInterface::class);
         $token = $tokenStorage->getToken();
 
-        if (!$token || !is_object($token->getUser())) {
+        if (!$token || !($token->getUser() instanceof User)) {
             return null;
         }
 
-        return $token->getUser();
+        /** @var User $user */
+        $user = $token->getUser();
+        return $user;
     }
 
     /** Suit la redirection après une requête */

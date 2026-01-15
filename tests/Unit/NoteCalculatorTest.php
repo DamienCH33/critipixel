@@ -28,6 +28,9 @@ final class NoteCalculatorTest extends TestCase
         self::assertEquals($expected, $videoGame->getNumberOfRatingsPerValue());
     }
 
+    /**
+     * @return iterable<string, array{VideoGame, NumberOfRatingPerValue}>
+     */
     public static function provideVideoGames(): iterable
     {
         yield 'no review' => [new VideoGame(), new NumberOfRatingPerValue()];
@@ -58,13 +61,15 @@ final class NoteCalculatorTest extends TestCase
     ): NumberOfRatingPerValue {
         $expected = new NumberOfRatingPerValue();
 
-        foreach ([
-            'One' => $one,
-            'Two' => $two,
-            'Three' => $three,
-            'Four' => $four,
-            'Five' => $five,
-        ] as $method => $count) {
+        foreach (
+            [
+                'One' => $one,
+                'Two' => $two,
+                'Three' => $three,
+                'Four' => $four,
+                'Five' => $five,
+            ] as $method => $count
+        ) {
             for ($i = 0; $i < $count; ++$i) {
                 $expected->{"increase$method"}();
             }

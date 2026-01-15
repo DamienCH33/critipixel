@@ -27,6 +27,9 @@ final class AverageRatingCalculatorTest extends TestCase
         self::assertSame($expected, $videoGame->getAverageRating());
     }
 
+    /**
+     * @return iterable<string, array{VideoGame, ?int}>
+     */
     public static function provideVideoGames(): iterable
     {
         yield 'no review' => [new VideoGame(), null];

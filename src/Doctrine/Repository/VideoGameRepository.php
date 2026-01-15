@@ -12,6 +12,9 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
+/**
+ * @extends ServiceEntityRepository<VideoGame>
+ */
 final class VideoGameRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
@@ -19,6 +22,9 @@ final class VideoGameRepository extends ServiceEntityRepository
         parent::__construct($registry, VideoGame::class);
     }
 
+    /**
+     * @return Paginator<VideoGame>
+     */
     public function getVideoGames(Pagination $pagination, Filter $filter): Paginator
     {
         $qb = $this->createQueryBuilder('vg')
@@ -31,28 +37,25 @@ final class VideoGameRepository extends ServiceEntityRepository
                 $pagination->getDirection()->getSql()
             );
 
-        // --- Filtrage texte ---
+        // Filtrage texte
         $search = $filter->getSearch();
-        if (!empty($search)) {
+        if ($search !== '') {
             $qb->andWhere(
                 $qb->expr()->orX(
                     $qb->expr()->like('vg.title', ':search'),
                     $qb->expr()->like('vg.description', ':search'),
                     $qb->expr()->like('vg.test', ':search')
                 )
-            )->setParameter('search', '%'.$search.'%');
+            )->setParameter('search', '%' . $search . '%');
         }
 
-        // --- Filtrage tags ---
+        // Filtrage tags
         $tags = $filter->getTags();
         if (!empty($tags)) {
+            /** @var int[] $tagIds */
             $tagIds = [];
             foreach ($tags as $tag) {
-                if ($tag instanceof Tag) {
-                    $tagIds[] = $tag->getId();
-                } elseif (is_numeric($tag)) {
-                    $tagIds[] = (int) $tag;
-                }
+                $tagIds[] = $tag->getId();
             }
 
             $existingTags = $this->getEntityManager()
@@ -61,11 +64,10 @@ final class VideoGameRepository extends ServiceEntityRepository
 
             if (empty($existingTags)) {
                 $qb->andWhere('1 = 0');
-
                 return new Paginator($qb, fetchJoinCollection: true);
             }
 
-            $validTagIds = array_map(fn (Tag $t) => $t->getId(), $existingTags);
+            $validTagIds = array_map(fn(Tag $t): int => $t->getId(), $existingTags);
 
             $subQb = $this->getEntityManager()->createQueryBuilder();
             $subQb->select('vg2.id')

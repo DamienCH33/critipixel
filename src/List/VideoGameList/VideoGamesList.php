@@ -24,21 +24,23 @@ final class VideoGamesList implements \Countable, \IteratorAggregate
     private Filter $filter;
 
     /**
-     * @var Paginator<VideoGame>
+     * @var Paginator<VideoGame>|null
      */
-    private Paginator $data;
+    private ?Paginator $data = null;
 
     private string $route;
 
-    private array $routeParameters;
+    /**
+     * @var array<string, mixed>
+     */
+    private array $routeParameters = [];
 
     public function __construct(
         private UrlGeneratorInterface $urlGenerator,
         private FormFactoryInterface $formFactory,
         private VideoGameRepository $videoGameRepository,
         private Pagination $pagination,
-    ) {
-    }
+    ) {}
 
     public function getForm(): FormView
     {
@@ -141,12 +143,20 @@ final class VideoGamesList implements \Countable, \IteratorAggregate
 
     public function getIterator(): \Traversable
     {
+        if ($this->data === null) {
+            throw new \RuntimeException('Data is not initialized, call handleRequest() first.');
+        }
+
         return $this->data;
     }
 
     public function count(): int
     {
-        return count($this->data->getIterator());
+        if ($this->data === null) {
+            return 0;
+        }
+
+        return count(iterator_to_array($this->data->getIterator()));
     }
 
     public function generateUrl(int $page): string

@@ -23,15 +23,14 @@ final class Pagination implements \IteratorAggregate, \Countable
     /**
      * @var Page[]
      */
-    private array $pages;
+    private array $pages = [];
 
     public function __construct(
         private int $page,
         private int $limit,
         private Sorting $sorting,
         private Direction $direction,
-    ) {
-    }
+    ) {}
 
     public function getOffset(): int
     {
@@ -62,7 +61,7 @@ final class Pagination implements \IteratorAggregate, \Countable
     }
 
     /**
-     * @return \Traversable<string, int>
+     * @return \Traversable<int, Page>
      */
     public function getIterator(): \Traversable
     {
@@ -96,12 +95,15 @@ final class Pagination implements \IteratorAggregate, \Countable
     {
         return $this->limit;
     }
-
-    public function getDirections(): array
+    /**
+     * @return Direction[]
+     */    public function getDirections(): array
     {
         return Direction::cases();
     }
-
+    /**
+     * @return Sorting[]
+     */
     public function getAllSorting(): array
     {
         return Sorting::cases();
