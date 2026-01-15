@@ -23,8 +23,8 @@ use Symfony\Component\Validator\Constraints\PasswordStrength;
 
 #[Entity]
 #[Table('`user`')]
-#[UniqueEntity('email')]
-#[UniqueEntity('username')]
+#[UniqueEntity(fields: ['email'], message: 'Cet email est déjà utilisé.')]
+#[UniqueEntity(fields: ['username'], message: 'Ce nom d\'utilisateur existe déjà.')]
 #[EntityListeners([UserListener::class])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -36,20 +36,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[NotBlank]
     #[Length(max: 30)]
     #[Column(length: 30, unique: true)]
-    private string $username;
+    private ?string $username = null;
 
     #[NotBlank]
     #[Email]
     #[NoSuspiciousCharacters]
     #[Column(unique: true)]
-    private string $email;
+    private ?string $email = null;
 
-    #[Column(length: 60)]
-    private string $password;
+    #[Column(length: 60, nullable: true)]
+    private ?string $password = null;
 
-    #[NotBlank]
-    #[NotCompromisedPassword]
-    #[PasswordStrength]
     private ?string $plainPassword = null;
 
     public function getId(): ?int
@@ -57,7 +54,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->id;
     }
 
-    public function getUsername(): string
+    public function getUsername(): ?string
     {
         return $this->username;
     }
@@ -69,7 +66,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getEmail(): string
+    public function getEmail(): ?string
     {
         return $this->email;
     }
@@ -81,7 +78,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getPassword(): string
+    public function getPassword(): ?string
     {
         return $this->password;
     }
