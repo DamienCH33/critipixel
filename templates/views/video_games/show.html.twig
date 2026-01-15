@@ -1,101 +1,90 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div class="container">
-        <div class="row mb-4">
-            <div class="col">
-                <div class="rounded-5 bg-light p-4 d-flex flex-column align-items-center">
-                    <h1 class="mb-4 text-center text-uppercase">{{ video_game.title }}</h1>
-                    <div class="tags d-flex justify-content-center gap-3 mb-3">
-                        {% for tag in video_game.tags %}
-                            <span class="badge bg-primary">{{ tag.name }}</span>
-                        {% endfor %}
-                    </div>
-                    <small class="text-muted">Sortie: {{ video_game.releaseDate|date('m/d/Y') }}</small>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-4">
-                <img src="{{ vich_uploader_asset(video_game, 'imageFile', 'App\\Model\\Entity\\VideoGame') }}" class="img-fluid rounded" alt="Couverture de {{ video_game.title|e }}">
-                <div class="ratings justify-content-between mt-3">
-                    <twig:Rating rating="{{ video_game.rating }}" label="Test" />
-                    {% if video_game.averageRating is not null %}
-                        <twig:Rating rating="{{ video_game.averageRating }}" label="Avis" />
-                    {% endif %}
-                </div>
-                <div class="mt-4">
-                    <h2 class="text-uppercase">Notes ({{ video_game.reviews|length }})</h2>
-                    <ul class="d-flex flex-column gap-2 p-0">
-                        <li class="d-flex gap-2 align-items-center">
-                            <span>5/5</span>
-                            {{ component('Progress', { videoGame: video_game, number: video_game.numberOfRatingsPerValue.numberOfFive }) }}
-                            <span>{{ video_game.numberOfRatingsPerValue.numberOfFive }}</span>
-                        </li>
-                        <li class="d-flex gap-2 align-items-center">
-                            <span>4/5</span>
-                            {{ component('Progress', { videoGame: video_game, number: video_game.numberOfRatingsPerValue.numberOfFour }) }}
-                            <span>{{ video_game.numberOfRatingsPerValue.numberOfFour }}</span>
-                        </li>
-                        <li class="d-flex gap-2 align-items-center">
-                            <span>3/5</span>
-                            {{ component('Progress', { videoGame: video_game, number: video_game.numberOfRatingsPerValue.numberOfThree }) }}
-                            <span>{{ video_game.numberOfRatingsPerValue.numberOfThree }}</span>
-                        </li>
-                        <li class="d-flex gap-2 align-items-center">
-                            <span>2/5</span>
-                            {{ component('Progress', { videoGame: video_game, number: video_game.numberOfRatingsPerValue.numberOfTwo }) }}
-                            <span>{{ video_game.numberOfRatingsPerValue.numberOfTwo }}</span>
-                        </li>
-                        <li class="d-flex gap-2 align-items-center">
-                            <span>1/5</span>
-                            {{ component('Progress', { videoGame: video_game, number: video_game.numberOfRatingsPerValue.numberOfOne }) }}
-                            <span>{{ video_game.numberOfRatingsPerValue.numberOfOne }}</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <div class="col-8">
-                <twig:Tabs>
-                    {% block home %}
-                        <div class="bg-light p-3 rounded">
-                            <h2 class="text-uppercase">Description</h2>
-                            {{ video_game.description|nl2br }}
-                        </div>
-                    {% endblock %}
-                    {% block test %}
-                        <div class="bg-light p-3 rounded">
-                            <h2 class="text-uppercase">Test CritiPixel</h2>
-                            {{ video_game.test|nl2br }}
-                        </div>
-                    {% endblock %}
-                    {% block reviews %}
-                        <div class="bg-light p-3 rounded">
-                            <h2 class="text-uppercase">Avis des lecteurs</h2>
-                            {% if is_granted('review', video_game) %}
-                                <div class="mb-4">
-                                    {{ form_start(form, { attr: { name: 'review' } }) }}
-                                        {{ form_errors(form) }}
-                                        <fieldset class="mb-3">
-                                            {{ form_row(form.rating) }}
-                                            {{ form_errors(form.rating) }}
-                                            {{ form_row(form.comment) }}
-                                            {{ form_errors(form.comment) }}
-                                        </fieldset>
-                                        <button class="btn btn-primary py-2" type="submit">Poster</button>
-                                    {{ form_end(form) }}
-                                </div>
-                            {% endif %}
-                            <div class="list-group">
-                                {% for review in video_game.reviews %}
-                                    {{ component('Review', { review: review }) }}
-                                {% endfor %}
-                            </div>
-                        </div>
-                    {% endblock %}
-                </twig:Tabs>
-            </div>
-        </div>
-    </div>
+	<div class="container">
+		<div class="row mb-4">
+			<div class="col">
+				<div class="rounded-5 bg-light p-4 d-flex flex-column align-items-center">
+					<h1 class="mb-4 text-center text-uppercase">{{ video_game.title }}</h1>
+					<div class="tags d-flex justify-content-center gap-3 mb-3">
+						{% for tag in video_game.tags %}
+							<span class="badge bg-primary">{{ tag.name }}</span>
+						{% endfor %}
+					</div>
+					<small class="text-muted">Sortie:
+						{{ video_game.releaseDate|date('m/d/Y') }}</small>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-4">
+				<img src="{{ vich_uploader_asset(video_game, 'imageFile', 'App\\Model\\Entity\\VideoGame') }}" class="img-fluid rounded" alt="Couverture de {{ video_game.title|e }}">
+				<div class="ratings justify-content-between mt-3">
+					<twig:Rating rating="{{ video_game.rating }}" label="Test"/>
+					{% if video_game.averageRating is not null %}
+						<twig:Rating rating="{{ video_game.averageRating }}" label="Avis"/>
+					{% endif %}
+				</div>
+				<div class="mt-4">
+					<h2 class="text-uppercase">Notes ({{ video_game.reviews|length }})</h2>
+					<ul class="d-flex flex-column gap-2 p-0">
+						{% set ratingKeys = ['Five','Four','Three','Two','One'] %}
+						{% for i in 0..4 %}
+							{% set ratingValue = attribute(video_game.numberOfRatingsPerValue, 'numberOf' ~ ratingKeys[i]) %}
+							<li class="d-flex gap-2 align-items-center">
+								<span>{{ 5 - i }}/5</span>
+								{{ component('Progress', { videoGame: video_game, number: ratingValue }) }}
+								<span>{{ ratingValue }}</span>
+							</li>
+						{% endfor %}
+					</ul>
+				</div>
+			</div>
+			<div class="col-8">
+				<twig:Tabs>
+					{% block home %}
+						<div class="bg-light p-3 rounded">
+							<h2 class="text-uppercase">Description</h2>
+							{{ video_game.description|nl2br }}
+						</div>
+					{% endblock %}
+					{% block test %}
+						<div class="bg-light p-3 rounded">
+							<h2 class="text-uppercase">Test CritiPixel</h2>
+							{{ video_game.test|nl2br }}
+						</div>
+					{% endblock %}
+					{% block reviews %}
+						<div class="bg-light p-3 rounded">
+							<h2 class="text-uppercase">Avis des lecteurs</h2>
+							{% if is_granted('review', video_game) %}
+								<div class="mb-4">
+									{{ form_start(form) }}
+									<fieldset class="mb-3">
+										<div class="mb-3">
+											{{ form_label(form.rating) }}
+											{{ form_widget(form.rating, { 'attr': {'class':'form-select'} }) }}
+											{{ form_errors(form.rating) }}
+										</div>
+										<div class="mb-3">
+											{{ form_label(form.comment) }}
+											{{ form_widget(form.comment, { 'attr': {'class':'form-control','placeholder':'Commentaire'} }) }}
+											{{ form_errors(form.comment) }}
+										</div>
+									</fieldset>
+									<button class="btn btn-primary py-2" type="submit">Poster</button>
+									{{ form_end(form) }}
+								</div>
+							{% endif %}
+							<div class="list-group">
+								{% for review in video_game.reviews %}
+									{{ component('Review', { review: review }) }}
+								{% endfor %}
+							</div>
+						</div>
+					{% endblock %}
+				</twig:Tabs>
+			</div>
+		</div>
+	</div>
 {% endblock %}
-

@@ -38,7 +38,7 @@ final class ShowTest extends FunctionalTestCase
     /** Cas nominal : ajout d'une review par un utilisateur connecté */
     public function testShouldPostReview(): void
     {
-        $this->login(); // utilisateur connecté
+        $this->login(); 
         $this->get('/jeu-video-49');
         self::assertResponseIsSuccessful();
 
@@ -85,7 +85,7 @@ final class ShowTest extends FunctionalTestCase
         ]);
 
         self::assertSelectorNotExists('form[name="review[comment]"]');
-        self::assertSelectorCount(2, '.invalid-feedback');
+        self::assertSelectorCount(3, '.invalid-feedback');
     }
 
     /** Test qu’un utilisateur ne peut pas poster plusieurs reviews pour le même jeu */
