@@ -5,12 +5,26 @@
         <div class="row justify-content-center">
             {{ form_start(form) }}
                 <h1 class="h3 mb-3 fw-normal">Bienvenue !</h1>
-                {{ form_errors(form) }}
+                {% if form_errors(form) is not empty %}
+                    <div class="form-error-message">
+                        {{ form_errors(form) }}
+                    </div>
+                {% endif %}
+
                 <fieldset class="mb-3">
-                    {{ form_row(form.username) }}
-                    {{ form_row(form.email) }}
-                    {{ form_row(form.plainPassword) }}
+                    {% for field in [form.username, form.email, form.plainPassword.first, form.plainPassword.second] %}
+                        <div class="mb-3">
+                            {{ form_label(field) }}
+                            {{ form_widget(field) }}
+                            {% if form_errors(field) is not empty %}
+                                <div class="form-error-message">
+                                    {{ form_errors(field) }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
                 </fieldset>
+
                 <button class="btn btn-primary w-100 py-2" type="submit">S'inscrire</button>
             {{ form_end(form) }}
         </div>

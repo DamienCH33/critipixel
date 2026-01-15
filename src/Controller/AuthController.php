@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
@@ -26,21 +27,40 @@ final class AuthController extends AbstractController
         ]);
     }
 
-    #[Route('/register', name: 'register', methods: [Request::METHOD_GET, Request::METHOD_POST])]
-    public function register(Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $user = new User();
+   #[Route('/register', name: 'register')]
+public function register(
+    Request $request,
+    EntityManagerInterface $entityManager,
+    UserPasswordHasherInterface $passwordHasher
+): Response {
+    $user = new User();
+    $form = $this->createForm(RegisterType::class, $user);
+    $form->handleRequest($request);
 
-        $form = $this->createForm(RegisterType::class, $user)->handleRequest($request);
+    if ($form->isSubmitted()) {
+        if ($form->isValid()) {
+            // Hash du mot de passe
+            $hashedPassword = $passwordHasher->hashPassword(
+                $user,
+                $form->get('plainPassword')->get('first')->getData()
+            );
+            $user->setPassword($hashedPassword);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+            // Persistance en base
             $entityManager->persist($user);
             $entityManager->flush();
-            $this->addFlash('success', 'Inscription réussie. Vous pouvez vous connecter !');
 
+            // Redirection seulement si tout est ok
             return $this->redirectToRoute('auth_login');
         }
 
-        return $this->render('views/auth/register.html.twig', ['form' => $form]);
+        // Ici, Symfony va automatiquement gérer les erreurs de validation
+        // (ex : UniqueEntity sur username ou email)
+        // et les transmettre à la vue
     }
+
+    return $this->render('views/auth/register.html.twig', [
+        'form' => $form->createView(),
+    ]);
+}
 }
