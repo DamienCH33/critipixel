@@ -15,11 +15,6 @@ use Symfony\Component\Validator\Constraints\NotNull;
 
 final class ReviewType extends AbstractType
 {
-    public function configureOptions(OptionsResolver $resolver): void
-    {
-        $resolver->setDefault('data_class', Review::class);
-    }
-
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
@@ -45,5 +40,12 @@ final class ReviewType extends AbstractType
                     'placeholder' => 'Commentaire',
                 ],
             ]);
+    }
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'data_class' => Review::class,
+            'csrf_protection' => false,
+        ]);
     }
 }
