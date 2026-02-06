@@ -27,30 +27,37 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up PHP
-        uses: shivammathur/setup-php@v3
+        uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.2
-          extensions: mbstring, intl, pdo_pgsql, xdebug
+          php-version: "8.2"
+          extensions: mbstring, intl, pdo_pgsql
+          coverage: xdebug
           ini-values: date.timezone=Europe/Paris
-          tools: composer
+          tools: composer:v2
 
       - name: Install dependencies
-        run: composer install --prefer-dist --no-progress --no-interaction
+        run: composer install --prefer-dist --no-progress --no-interaction --optimize-autoloader
 
-      - name: Create test database
+      - name: Wait for PostgreSQL
+        run: |
+          until pg_isready -h 127.0.0.1 -p 5432 -U postgres; do
+            sleep 1
+          done
+
+      - name: Create database & schema
         env:
           DATABASE_URL: "postgresql://postgres:root@127.0.0.1:5432/critipixel_test?serverVersion=17&charset=utf8"
         run: |
           php bin/console doctrine:database:create --env=test --if-not-exists
           php bin/console doctrine:schema:create --env=test
 
-      - name: Run PHPUnit tests
+      - name: Run PHPUnit
         env:
           DATABASE_URL: "postgresql://postgres:root@127.0.0.1:5432/critipixel_test?serverVersion=17&charset=utf8"
-        run: vendor/bin/phpunit --coverage-text
+        run: vendor/bin/phpunit --testdox
 
       - name: Run PHPStan
         run: vendor/bin/phpstan analyse src tests --memory-limit=512M
