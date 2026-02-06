@@ -1,0 +1,63 @@
+name: CI Symfony
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: root
+          POSTGRES_DB: critipixel_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: mbstring, intl, pdo_pgsql
+          coverage: xdebug
+          ini-values: date.timezone=Europe/Paris
+          tools: composer:v2
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction --optimize-autoloader
+
+      - name: Wait for PostgreSQL
+        run: |
+          until pg_isready -h 127.0.0.1 -p 5432 -U postgres; do
+            sleep 1
+          done
+
+      - name: Create database & schema
+        env:
+          DATABASE_URL: "postgresql://postgres:root@127.0.0.1:5432/critipixel_test?serverVersion=17&charset=utf8"
+        run: |
+          php bin/console doctrine:database:create --env=test --if-not-exists
+          php bin/console doctrine:schema:create --env=test
+
+      - name: Run PHPUnit
+        env:
+          DATABASE_URL: "postgresql://postgres:root@127.0.0.1:5432/critipixel_test?serverVersion=17&charset=utf8"
+        run: vendor/bin/phpunit --testdox
+
+      - name: Run PHPStan
+        run: vendor/bin/phpstan analyse src tests --memory-limit=512M
