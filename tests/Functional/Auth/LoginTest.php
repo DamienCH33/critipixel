@@ -33,7 +33,7 @@ final class LoginTest extends FunctionalTestCase
 
         $this->client->submitForm('login_submit', [
             'email' => 'user+1@email.com',
-            'password' => 'password',
+            'password' => 'wrong_password',
         ]);
 
         $authorizationChecker = $this->service(AuthorizationCheckerInterface::class);
