@@ -39,24 +39,17 @@ public function register(
 
     if ($form->isSubmitted()) {
         if ($form->isValid()) {
-            // Hash du mot de passe
             $hashedPassword = $passwordHasher->hashPassword(
                 $user,
                 $form->get('plainPassword')->get('first')->getData()
             );
             $user->setPassword($hashedPassword);
 
-            // Persistance en base
             $entityManager->persist($user);
             $entityManager->flush();
 
-            // Redirection seulement si tout est ok
             return $this->redirectToRoute('auth_login');
         }
-
-        // Ici, Symfony va automatiquement gérer les erreurs de validation
-        // (ex : UniqueEntity sur username ou email)
-        // et les transmettre à la vue
     }
 
     return $this->render('views/auth/register.html.twig', [

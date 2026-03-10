@@ -21,6 +21,8 @@ class VideoGameVoter extends Voter
 
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
     {
+        /** @var VideoGame $subject */
+        
         $user = $token->getUser();
 
         if (!$user instanceof User) {

@@ -2,11 +2,57 @@
 
 # CritiPixel
 
-## Pré-requis
-* PHP >= 8.2
-* Composer
-* Extension PHP Xdebug
-* Symfony (binaire)
+## Description
+
+CritiPixel est une application Symfony permettant de consulter et d'évaluer des jeux vidéo.
+
+Ce projet met en place une architecture backend propre ainsi que des tests automatisés afin d'assurer la qualité du code.
+
+![CI](https://github.com/DamienCH33/critipixel/actions/workflows/ci.yml/badge.svg)
+
+## Stack technique
+
+- PHP 8.2
+- Symfony
+- Doctrine ORM
+- PostgreSQL
+- PHPUnit
+- PHPStan
+- Docker
+
+## Architecture
+
+Le projet suit une architecture Symfony classique :
+
+src/
+ ├ Controller
+ ├ Doctrine
+ │   ├ Repository
+ │   └ DataFixtures
+ ├ EntityListener
+ ├ Form
+ ├ List
+ ├ Rating
+ |-Twig
+ ├ Security
+ │   └ Voter
+ └ Tests
+
+Composants principaux :
+
+- **RatingHandler** : calcule la moyenne des notes et la distribution des votes
+- **VideoGameRepository** : pagination et filtrage des jeux vidéo
+- **VideoGameVoter** : empêche un utilisateur de poster plusieurs reviews
+- **PaginationValueResolver** : injecte automatiquement la pagination dans les controllers
+
+## Fonctionnalités
+
+- consultation des jeux vidéo
+- publication de reviews
+- système de notation
+- filtrage par tags
+- pagination
+- authentification utilisateur
 
 ## Installation
 
@@ -63,17 +109,12 @@ symfony console doctrine:fixtures:load -n --purge-with-truncate
 
 *Note : Vous pouvez exécuter ces commandes avec l'option `--env=test` pour les exécuter dans l'environnement de test.*
 
-### SASS
-
-#### Compiler les fichiers SASS
-```bash
-symfony console sass:build
-```
-*Note : le fichier `.symfony.local.yaml` est configuré pour surveiller les fichiers SASS et les compiler automatiquement quand vous lancez le serveur web de Symfony.*
-
 ### Tests
 ```bash
 symfony php bin/phpunit
+
+### Analyse statique
+vendor/bin/phpstan analyse
 ```
 
 *Note : Penser à charger les fixtures avant chaque éxécution des tests.*
@@ -82,3 +123,12 @@ symfony php bin/phpunit
 ```bash
 symfony serve
 ```
+
+## Tests
+
+Le projet contient :
+
+- tests unitaires
+- tests fonctionnels
+- analyse statique avec PHPStan
+- pipeline CI GitHub Actions
