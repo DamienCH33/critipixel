@@ -53,6 +53,9 @@ jobs:
 
       - name: Validate Composer files
         run: composer validate --no-check-publish
+      - name: Run Symfony auto-scripts, including Importmap install
+        run: composer run-script auto-scripts --no-interaction
+
       - name: Wait for PostgreSQL
         run: |
           until pg_isready -h 127.0.0.1 -p 5432 -U postgres; do
