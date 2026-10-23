@@ -1,0 +1,50 @@
+name: Temporary Composer security refresh
+
+on:
+  push:
+    branches:
+      - chore/security-update-critipixel-2026-10
+    paths:
+      - "composer.json"
+      - ".github/workflows/temp-composer-refresh.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up PHP and Composer
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.2"
+          extensions: mbstring, intl, pdo_pgsql
+          tools: composer:v2
+
+      - name: Audit locked dependencies before update
+        run: composer audit --locked || true
+
+      - name: Update supported Symfony 6.4 components
+        run: composer update "symfony/*" --with-all-dependencies --no-interaction --no-progress --no-scripts
+
+      - name: Validate Composer files
+        run: composer validate --strict
+
+      - name: Audit refreshed lock
+        run: composer audit --locked || true
+
+      - name: Commit refreshed lock file
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- composer.lock; then
+            echo "composer.lock is already current"
+            exit 0
+          fi
+          git add composer.lock
+          git commit -m "chore: refresh Symfony dependencies"
+          git push origin HEAD
