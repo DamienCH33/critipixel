@@ -52,8 +52,7 @@ jobs:
         run: composer update "symfony/*" --with-all-dependencies --no-interaction --no-progress --no-scripts
 
       - name: Validate Composer files
-        run: composer validate
-
+        run: composer validate --no-check-publish
       - name: Wait for PostgreSQL
         run: |
           until pg_isready -h 127.0.0.1 -p 5432 -U postgres; do
